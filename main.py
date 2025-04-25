@@ -45,6 +45,26 @@ def get_controller_screen_coordinates(hand,landmark_id):
 
     return [x_screen,y_screen]
 
+def print_message(image,selector):
+    match selector:
+        case 0:
+            text="Mouse moving"
+            color=(0,255,0)
+        case 1:
+            text="Left click"
+            color=(0,255,0)          
+        case 2:
+            text="Right click"
+            color=(255,127,0)                
+        case 3:
+            text="Double click"
+            color=(0,0,255)
+        case _:
+            return None   
+
+    cv2.putText(image, text,(10,10), cv2.FONT_HERSHEY_SIMPLEX,1,color,2,cv2.LINE_AA)
+    return 
+           
 
 with mp_hands.Hands(min_detection_confidence=0.8,min_tracking_confidence=0.5) as hands :
     while cap.isOpened():
@@ -80,8 +100,8 @@ with mp_hands.Hands(min_detection_confidence=0.8,min_tracking_confidence=0.5) as
         if results.multi_hand_landmarks:
             for num, hand in enumerate(results.multi_hand_landmarks):
                 mp_drawing.draw_landmarks(image,hand,mp_hands.HAND_CONNECTIONS,
-                                          mp_drawing.DrawingSpec(color=(121,22,76), thickness=2, circle_radius=4),
-                                            mp_drawing.DrawingSpec(color=(121,44,250), thickness=2, circle_radius=2))
+                                          mp_drawing.DrawingSpec(color=(255,255,120), thickness=2, circle_radius=4),
+                                            mp_drawing.DrawingSpec(color=(255,76,134), thickness=2, circle_radius=2))
                 
                 #Render Left or right hand label
                 if get_hand_label(num, hand, results,width,height):
@@ -98,15 +118,17 @@ with mp_hands.Hands(min_detection_confidence=0.8,min_tracking_confidence=0.5) as
                     #use right hand for cursor
                     if name_hand=="Right":
                         draw_controller(image,hand,landmark_id)
-                        detection.interactWithScreen(hand,x_screen, y_screen)
+                        selector=detection.interactWithScreen(hand,x_screen, y_screen)
+                        print_message(image,selector)
                 #use unique hand for cursor        
                 if len(results.multi_hand_landmarks)==1:
                     screen_coordinates = get_controller_screen_coordinates(hand,landmark_id)
                     x_screen = screen_coordinates[0]
                     y_screen = screen_coordinates[1]
                     draw_controller(image,hand,landmark_id)
-                    detection.interactWithScreen(hand,x_screen, y_screen)
-                else :
+                    selector=detection.interactWithScreen(hand,x_screen, y_screen)
+                    print_message(image,selector)
+                if len(results.multi_hand_landmarks)>2:
                     txt="Too much hands on screen"
                     cv2.putText(image, txt,(10,10), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2,cv2.LINE_AA)
                    

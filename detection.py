@@ -1,4 +1,3 @@
-from math import sqrt 
 import numpy as np
 import pyautogui
 import time
@@ -31,24 +30,28 @@ def get_finger(hand,name=""):
     return None
 
 def get_distance(a,b):
-    norm=sqrt(pow(a[0]-b[0],2)+pow(a[1]-b[1],2)+pow(a[2]-b[2],2))
-    return norm
+    norm=np.hypot(b[0]-a[0],b[1]-a[1])
+    result=np.interp(norm,[0,1],[0,1000])
+    return result
 
 def get_angle(a,b,c):
-    n = get_distance(a,c)
-    l = get_distance(a,b)
-    alpha = np.arctan(n/l)
-    return alpha
+    gama=np.arctan2(c[1]-b[1],c[0]-b[0])
+    beta=np.arctan2(a[1]-b[1],a[0]-b[0])
+    alpha=beta-gama
+    r=np.degrees(alpha)
+    return abs(r)
 
-def isPalmFingerBent(hand,name=""):
-    finger=get_finger(hand,name="")
+def isPalmFingerBent(hand,name):
+    finger=get_finger(hand,name)
+    print("ici")
     if finger!=None:
+        print("là")
         a=finger[0]
         b=finger[2]
         c=finger[3]
         alpha=get_angle(a,b,c)
         print(f"alpha :{alpha}")
-        if alpha==0:
+        if alpha<90:
             return True
         return False
     return None #fallback
@@ -61,8 +64,8 @@ def isThumbBent(hand):
         b=thumb[2]
         c=index[3]
         alpha=get_angle(a,b,c)
-        print(f"alpha :{alpha}")
-        if alpha==0:
+        print(f"alpha THUMB:{alpha}")
+        if alpha<20 and get_distance(a,c)<50:
             return True
         return False
     return None #fallback
@@ -71,15 +74,33 @@ def left_click():
     pyautogui.click()  # Defaults to left click
     print("Left click performed")
     time.sleep(0.2)  # Small delay to avoid multiple clicks
+    return 1
 
 def right_click():
     pyautogui.click(button='right')
     print("Right click performed")
     time.sleep(0.2)
+    return 2
+
+def double_click():
+    pyautogui.doubleClick()
+    print("Double click performed")
+    time.sleep(0.2)
+    return 3
 
 def interactWithScreen(hand,x_screen, y_screen):
-    pyautogui.moveTo(x_screen, y_screen)
-    if(isPalmFingerBent(hand,name="middle")):
-        left_click()
-    if(isThumbBent(hand)):
-        right_click()
+    t=0
+    if not isPalmFingerBent(hand,name="index") and isThumbBent(hand) :
+        pyautogui.moveTo(x_screen, y_screen)
+        t=0
+        print(f"move :{t}")
+    if(not isThumbBent(hand) and isPalmFingerBent(hand,name="index") and not isPalmFingerBent(hand,name="middle")):
+        t=left_click()
+        print(f"move :{t}")
+    if(not isThumbBent(hand) and not isPalmFingerBent(hand,name="index") and isPalmFingerBent(hand,name="middle")):
+        t=right_click()
+        print(f"move :{t}")
+    if(not isThumbBent(hand) and isPalmFingerBent(hand,name="index") and isPalmFingerBent(hand,name="middle")):
+        t=double_click()
+        print(f"move :{t}")
+    return t
