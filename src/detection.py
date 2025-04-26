@@ -43,14 +43,11 @@ def get_angle(a,b,c):
 
 def isPalmFingerBent(hand,name):
     finger=get_finger(hand,name)
-    print("ici")
     if finger!=None:
-        print("là")
         a=finger[0]
         b=finger[2]
         c=finger[3]
         alpha=get_angle(a,b,c)
-        print(f"alpha :{alpha}")
         if alpha<90:
             return True
         return False
@@ -64,7 +61,6 @@ def isThumbBent(hand):
         b=thumb[2]
         c=index[3]
         alpha=get_angle(a,b,c)
-        print(f"alpha THUMB:{alpha}")
         if alpha<20 and get_distance(a,c)<50:
             return True
         return False
@@ -93,14 +89,10 @@ def interactWithScreen(hand,x_screen, y_screen):
     if not isPalmFingerBent(hand,name="index") and isThumbBent(hand) :
         pyautogui.moveTo(x_screen, y_screen)
         t=0
-        print(f"move :{t}")
     if(not isThumbBent(hand) and isPalmFingerBent(hand,name="index") and not isPalmFingerBent(hand,name="middle")):
         t=left_click()
-        print(f"move :{t}")
     if(not isThumbBent(hand) and not isPalmFingerBent(hand,name="index") and isPalmFingerBent(hand,name="middle")):
         t=right_click()
-        print(f"move :{t}")
     if(not isThumbBent(hand) and isPalmFingerBent(hand,name="index") and isPalmFingerBent(hand,name="middle")):
         t=double_click()
-        print(f"move :{t}")
     return t

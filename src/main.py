@@ -9,8 +9,6 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 cap=cv2.VideoCapture(0)
-writer = cv2.VideoWriter_fourcc(*'MP4V')
-out = cv2.VideoWriter('../videos/output.mp4', writer, 30.0, (640,480))
 
 """index: the hand result (i.e 0 or 1), hand: the actual hand landmarks, results: all detections from model"""
 def get_hand_label(index,hand,results,width,height):
@@ -54,7 +52,7 @@ def print_message(image,selector):
             color=(0,255,0)
         case 1:
             text="Left click"
-            color=(0,255,0)          
+            color=(255,0,0)          
         case 2:
             text="Right click"
             color=(80,102,227)                
@@ -134,21 +132,20 @@ with mp_hands.Hands(min_detection_confidence=0.8,min_tracking_confidence=0.5) as
                     print_message(image,selector)
                 if len(results.multi_hand_landmarks)>2:
                     txt="Too much hands on screen"
-                    cv2.putText(image, txt,(10,10), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2,cv2.LINE_AA)
+                    cv2.putText(image, txt,(10,30), cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2,cv2.LINE_AA)
                    
         cv2.imshow("Hand Tracking",image)
-        out.write(image)
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 
 
 cap.release()
-out.release()
+
 cv2.destroyAllWindows()
 
 print(f"Frame size: {width} x {height}")
-print(f"Camera FPS: {fps}")
+
 
 
 
